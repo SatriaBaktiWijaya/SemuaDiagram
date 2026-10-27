@@ -23,13 +23,14 @@
    - [5.5 Activity Diagram: Mencari Work Order](#55-activity-diagram-mencari-work-order)
    - [5.6 Activity Diagram: Mengenerate QR (Inklusi)](#56-activity-diagram-mengenerate-qr-inklusi)
    - [5.7 Activity Diagram: Membuat Nota Pembayaran](#57-activity-diagram-membuat-nota-pembayaran)
-6. **Sequence Diagrams (6 Interaksi Lengkap)**:
+6. **Sequence Diagrams (7 Interaksi Lengkap)**:
    - [6.1 Sequence Diagram: Melakukan Login](#61-sequence-diagram-melakukan-login)
-   - [6.2 Sequence Diagram: Melakukan CRUD Work Order](#62-sequence-diagram-melakukan-crud-work-order)
-   - [6.3 Sequence Diagram: Mengelola Progress & Auto QR](#63-sequence-diagram-mengelola-progress--auto-qr)
+   - [6.2 Sequence Diagram: Melakukan CRUD Work Order & Auto QR di Awal](#62-sequence-diagram-melakukan-crud-work-order--auto-qr-di-awal)
+   - [6.3 Sequence Diagram: Mengelola Progress](#63-sequence-diagram-mengelola-progress)
    - [6.4 Sequence Diagram: Melihat Progress (Pelanggan)](#64-sequence-diagram-melihat-progress-pelanggan)
    - [6.5 Sequence Diagram: Mencari Work Order](#65-sequence-diagram-mencari-work-order)
-   - [6.6 Sequence Diagram: Membuat Nota Pembayaran](#66-sequence-diagram-membuat-nota-pembayaran)
+   - [6.6 Sequence Diagram: Mengenerate QR Code (Inklusi Otomatis Work Order)](#66-sequence-diagram-mengenerate-qr-code-inklusi-otomatis-work-order)
+   - [6.7 Sequence Diagram: Membuat Nota Pembayaran](#67-sequence-diagram-membuat-nota-pembayaran)
 
 ---
 
@@ -78,7 +79,6 @@ Customer --> UC4
 Customer --> UC8
 
 UC2 ..> UC6 : <<include>>
-UC3 ..> UC6 : <<include>>
 UC5 ..> UC2 : <<extend>>
 @enduml
 ```
@@ -124,7 +124,6 @@ usecase-beta
     Customer --> UC8
 
     UC2 ..> : include UC6
-    UC3 ..> : include UC6
     UC2 ..> : extend UC5
 ```
 
@@ -178,7 +177,6 @@ flowchart LR
     %% Relasi Antar Use Case (Include & Extend)
     UC2 -.->|&lt;&lt;extend&gt;&gt;| UC5
     UC2 -.->|&lt;&lt;include&gt;&gt;| UC6
-    UC3 -.->|&lt;&lt;include&gt;&gt;| UC6
 
     %% Styling Visual untuk Draw.io
     classDef actorStyle fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#0D47A1,font-size:13px;
@@ -573,8 +571,7 @@ flowchart TD
     S3 --> P2
     
     S2 -->|Ya| S4[Sistem Menyimpan Data Progres Baru]
-    S4 --> S5[Sistem Mengenerate / Memperbarui QR Code Tracking]
-    S5 --> S6[Sistem Tampilkan Notifikasi Berhasil Simpan]
+    S4 --> S6[Sistem Tampilkan Notifikasi Berhasil Simpan]
     S6 --> P5{Pekerjaan Telah Selesai Semua?}
 
     P5 -->|Belum Selesai| EndNode([◉ Selesai])
@@ -595,7 +592,7 @@ flowchart TD
     classDef decision fill:#FFF9C4,stroke:#FBC02D,stroke-width:2px,color:#F57F17;
     
     class Start,EndNode startEnd;
-    class P1,S1,P2,P3,P4,S3,S4,S5,S6,P6,S7,S8,S9,S10 action;
+    class P1,S1,P2,P3,P4,S3,S4,S6,P6,S7,S8,S9,S10 action;
     class S2,P5,P7 decision;
 ```
 
@@ -652,15 +649,15 @@ flowchart TD
 
 ---
 
-### 5.6 Activity Diagram: Mengenerate QR (Inklusi)
+### 5.6 Activity Diagram: Mengenerate QR (Inklusi Otomatis Work Order)
 
 ```mermaid
 flowchart TD
-    Start([● Mulai]) --> S1[Sistem Menerima Trigger dari Pembaruan / Pembuatan Data Progres]
+    Start([● Mulai]) --> S1[Sistem Mendeteksi Work Order Berhasil Dibuat]
     S1 --> S2[Sistem Mengambil Nomor ID Work Order yang Sedang Diproses]
-    S2 --> S3[Sistem Mengenerate Gambar QR Code Unik Terhubung ke ID WO]
+    S2 --> S3[Sistem Mengenerate Gambar QR Code Untuk Terhubung ke ID WO]
     S3 --> S4[Sistem Menyimpan & Menautkan QR Code ke Database Pesanan]
-    S4 --> S5[Sistem Menyediakan QR Code untuk Dilihat / Diunduh]
+    S4 --> S5[Sistem Menyediakan QR Code Untuk Dilihat / Diunduh]
     S5 --> EndNode([◉ Selesai])
 
     classDef startEnd fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#1B5E20;
@@ -743,6 +740,8 @@ sequenceDiagram
     actor Staf as Admin / Marketing
     participant WOUI as View: WorkOrderPage
     participant WOCtrl as Controller: WorkOrderController
+    participant QRService as Service: QRCodeGenerator
+    participant FileStorage as Server File Storage
     participant WOModel as Model: WorkOrder
     participant BarangModel as Model: Barang
     participant DB as Database (MySQL)
@@ -757,8 +756,8 @@ sequenceDiagram
     WOCtrl-->>WOUI: 7. Render tabel Work Order
     WOUI-->>Staf: 8. Tampilkan daftar Work Order
 
-    %% Sub-skenario: Tambah Data Baru
-    opt Aksi Tambah Work Order (Create)
+    %% Sub-skenario: Tambah Data Baru & Generate QR Code di Awal
+    opt Aksi Tambah Work Order (Create) & Auto Generate QR Code di Awal
         Staf->>WOUI: 9. Klik tombol "Tambah Work Order"
         WOUI-->>Staf: 10. Tampilkan form WO kosong
         Staf->>WOUI: 11. Input data pelanggan & barang, klik Simpan
@@ -768,40 +767,50 @@ sequenceDiagram
         WOModel->>DB: 15. INSERT INTO work_orders (...)
         WOCtrl->>BarangModel: 16. create(data_barang)
         BarangModel->>DB: 17. INSERT INTO barang (...)
-        DB-->>WOCtrl: 18. Commit transaksi sukses
-        WOCtrl-->>WOUI: 19. Flash session notifikasi sukses & reload
-        WOUI-->>Staf: 20. Tampilkan data baru pada tabel WO
+        DB-->>WOCtrl: 18. Commit transaksi sukses (id_wo terbit)
+
+        %% Auto Generate QR Code 1 Kali di Awal Pembuatan
+        WOCtrl->>QRService: 19. generateQRCode(id_wo)
+        QRService->>FileStorage: 20. Simpan file gambar QR unik (.png)
+        FileStorage-->>QRService: 21. Return qr_image_path
+        QRService-->>WOCtrl: 22. Return token_qr & qr_image_path
+        WOCtrl->>WOModel: 23. updateQRCode(id_wo, qr_image_path, token_qr)
+        WOModel->>DB: 24. UPDATE work_orders SET qr_code_path = ?, qr_token = ? WHERE id = id_wo
+        DB-->>WOCtrl: 25. QR Code berhasil disimpan & ditautkan ke database pesanan
+
+        WOCtrl-->>WOUI: 26. Flash session notifikasi sukses & kirim data QR Code
+        WOUI-->>Staf: 27. Tampilkan data baru pada tabel WO beserta opsi cetak / unduh QR Code
     end
 
     %% Sub-skenario: Ubah Data
     opt Aksi Ubah Work Order (Update)
-        Staf->>WOUI: 21. Pilih baris data & klik "Ubah"
-        WOUI->>WOCtrl: 22. edit(id_wo)
-        WOCtrl-->>WOUI: 23. Kirim data WO & form edit
-        Staf->>WOUI: 24. Ubah atribut & klik Simpan
-        WOUI->>WOCtrl: 25. update(id_wo, Request $request)
-        WOCtrl->>WOModel: 26. update(data_perubahan)
-        WOModel->>DB: 27. UPDATE work_orders SET ... WHERE id = id_wo
-        DB-->>WOCtrl: 28. Status pembaruan berhasil
-        WOCtrl-->>WOUI: 29. Tampilkan notifikasi perubahan berhasil
+        Staf->>WOUI: 28. Pilih baris data & klik "Ubah"
+        WOUI->>WOCtrl: 29. edit(id_wo)
+        WOCtrl-->>WOUI: 30. Kirim data WO & form edit
+        Staf->>WOUI: 31. Ubah atribut & klik Simpan
+        WOUI->>WOCtrl: 32. update(id_wo, Request $request)
+        WOCtrl->>WOModel: 33. update(data_perubahan)
+        WOModel->>DB: 34. UPDATE work_orders SET ... WHERE id = id_wo
+        DB-->>WOCtrl: 35. Status pembaruan berhasil
+        WOCtrl-->>WOUI: 36. Tampilkan notifikasi perubahan berhasil
     end
 
     %% Sub-skenario: Hapus Data
     opt Aksi Hapus Work Order (Delete)
-        Staf->>WOUI: 30. Pilih data & klik "Hapus"
-        WOUI-->>Staf: 31. Tampilkan dialog konfirmasi hapus
-        Staf->>WOUI: 32. Klik tombol "Ya, Konfirmasi Hapus"
-        WOUI->>WOCtrl: 33. destroy(id_wo)
-        WOCtrl->>WOModel: 34. delete(id_wo)
-        WOModel->>DB: 35. DELETE FROM work_orders WHERE id = id_wo
-        DB-->>WOCtrl: 36. Status hapus berhasil
-        WOCtrl-->>WOUI: 37. Refresh tabel & tampilkan notifikasi berhasil
+        Staf->>WOUI: 37. Pilih data & klik "Hapus"
+        WOUI-->>Staf: 38. Tampilkan dialog konfirmasi hapus
+        Staf->>WOUI: 39. Klik tombol "Ya, Konfirmasi Hapus"
+        WOUI->>WOCtrl: 40. destroy(id_wo)
+        WOCtrl->>WOModel: 41. delete(id_wo)
+        WOModel->>DB: 42. DELETE FROM work_orders WHERE id = id_wo
+        DB-->>WOCtrl: 43. Status hapus berhasil
+        WOCtrl-->>WOUI: 44. Refresh tabel & tampilkan notifikasi berhasil
     end
 ```
 
 ---
 
-### 6.3 Sequence Diagram: Mengelola Progress & Auto QR
+### 6.3 Sequence Diagram: Mengelola Progress
 
 ```mermaid
 sequenceDiagram
@@ -810,7 +819,6 @@ sequenceDiagram
     participant ProgUI as View: ProgresPage
     participant ProgCtrl as Controller: ProgresController
     participant FileStorage as Server File Storage
-    participant QRService as Service: QRCodeGenerator
     participant ProgModel as Model: ProgresPengerjaan
     participant WOModel as Model: WorkOrder
     participant DB as Database (MySQL)
@@ -818,34 +826,33 @@ sequenceDiagram
     Prod->>ProgUI: 1. Pilih Work Order yang sedang dikerjakan
     ProgUI->>ProgCtrl: 2. getDetail(id_wo)
     ProgCtrl-->>ProgUI: 3. Tampilkan detail pesanan & form update progres
-    Prod->>ProgUI: 4. Input keterangan status & unggah berkas foto pengerjaan
+    Prod->>ProgUI: 4. Input keterangan tahapan kerja & unggah berkas foto pengerjaan
     Prod->>ProgUI: 5. Klik tombol "Simpan Progres"
-    ProgUI->>ProgCtrl: 6. storeProgres(id_wo, file, status)
+    ProgUI->>ProgCtrl: 6. storeProgres(id_wo, file, status, keterangan)
     
     ProgCtrl->>ProgCtrl: 7. Validasi format gambar (JPG/PNG, ukuran maks)
     ProgCtrl->>FileStorage: 8. Simpan berkas foto ke storage server
-    FileStorage-->>ProgCtrl: 9. Return file_path dokumen
+    FileStorage-->>ProgCtrl: 9. Return file_path dokumentasi
     
-    ProgCtrl->>QRService: 10. generateTrackingQR(id_wo)
-    QRService->>FileStorage: 11. Simpan gambar barcode QR unik
-    FileStorage-->>QRService: 12. Return qr_image_path
-    QRService-->>ProgCtrl: 13. Return token_qr & qr_image_path
+    ProgCtrl->>ProgModel: 10. insertProgres(id_wo, status, file_path, keterangan)
+    ProgModel->>DB: 11. INSERT INTO progres_pengerjaan (id_wo, status, foto_path, keterangan, created_at)
+    DB-->>ProgModel: 12. Record progres tersimpan
+    ProgModel-->>ProgCtrl: 13. Return status sukses
     
-    ProgCtrl->>ProgModel: 14. insertProgres(id_wo, status, foto_path, qr_path)
-    ProgModel->>DB: 15. INSERT INTO progres_pengerjaan (...)
-    DB-->>ProgCtrl: 16. Record tersimpan
-    
-    ProgCtrl-->>ProgUI: 17. Tampilkan notifikasi progres berhasil disimpan & tampilkan QR
+    ProgCtrl-->>ProgUI: 14. Tampilkan notifikasi: "Data progres dan dokumentasi berhasil diperbarui"
+    ProgUI-->>Prod: 15. Tampilkan riwayat progres pengerjaan terbaru
     
     opt Konfirmasi Pengerjaan Selesai (Finish)
-        Prod->>ProgUI: 18. Klik "Selesaikan Pekerjaan"
-        ProgUI-->>Prod: 19. Tampilkan konfirmasi dialog
-        Prod->>ProgUI: 20. Klik "Ya, Pekerjaan Selesai"
-        ProgUI->>ProgCtrl: 21. markAsComplete(id_wo)
-        ProgCtrl->>WOModel: 22. updateStatus(id_wo, 'Selesai')
-        WOModel->>DB: 23. UPDATE work_orders SET status = 'Selesai' WHERE id = id_wo
-        DB-->>ProgCtrl: 24. Berhasil diperbarui
-        ProgCtrl-->>ProgUI: 25. Tampilkan notifikasi status pengerjaan selesai
+        Prod->>ProgUI: 16. Klik "Selesaikan Pekerjaan"
+        ProgUI-->>Prod: 17. Tampilkan konfirmasi dialog
+        Prod->>ProgUI: 18. Klik "Ya, Pekerjaan Selesai"
+        ProgUI->>ProgCtrl: 19. markAsComplete(id_wo)
+        ProgCtrl->>WOModel: 20. updateStatus(id_wo, 'Selesai')
+        WOModel->>DB: 21. UPDATE work_orders SET status = 'Selesai' WHERE id = id_wo
+        DB-->>WOModel: 22. Status berhasil diperbarui
+        WOModel-->>ProgCtrl: 23. Konfirmasi update status
+        ProgCtrl-->>ProgUI: 24. Tampilkan notifikasi status pengerjaan telah selesai
+        ProgUI-->>Prod: 25. Perbarui status Work Order menjadi "Selesai"
     end
 ```
 
@@ -912,7 +919,48 @@ sequenceDiagram
 
 ---
 
-### 6.6 Sequence Diagram: Membuat Nota Pembayaran
+### 6.6 Sequence Diagram: Mengenerate QR Code (Inklusi Otomatis Work Order)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Staf as Admin / Marketing
+    participant WOUI as View: WorkOrderPage
+    participant WOCtrl as Controller: WorkOrderController
+    participant QRService as Service: QRCodeGenerator
+    participant FileStorage as Server File Storage
+    participant WOModel as Model: WorkOrder
+    participant DB as Database (MySQL)
+
+    Note over Staf, DB: Dipicu 1 Kali di Awal Saat Work Order Berhasil Dibuat (SRS 3.2.6)
+    
+    Staf->>WOUI: 1. Input data pesanan & submit form Work Order
+    WOUI->>WOCtrl: 2. store(Request $request)
+    WOCtrl->>WOModel: 3. create(data_wo)
+    WOModel->>DB: 4. INSERT INTO work_orders (...)
+    DB-->>WOCtrl: 5. Work Order berhasil tersimpan (ID WO terbit)
+    
+    %% Alur Sesuai Flowchart Draw.io
+    WOCtrl->>WOCtrl: 6. Sistem mendeteksi Work Order berhasil dibuat
+    WOCtrl->>WOCtrl: 7. Sistem mengambil nomor ID Work Order (id_wo) yang sedang diproses
+    
+    WOCtrl->>QRService: 8. generateTrackingQR(id_wo, tracking_url)
+    QRService->>QRService: 9. Sistem mengenerate gambar QR Code untuk terhubung ke ID WO
+    QRService->>FileStorage: 10. Simpan file gambar matriks QR (.png) ke direktori storage
+    FileStorage-->>QRService: 11. Return qr_image_path
+    QRService-->>WOCtrl: 12. Return token_unik & qr_image_path
+    
+    WOCtrl->>WOModel: 13. updateQRCode(id_wo, qr_image_path, token_unik)
+    WOModel->>DB: 14. UPDATE work_orders SET qr_code_path = ?, qr_token = ? WHERE id = id_wo
+    DB-->>WOCtrl: 15. Sistem menyimpan & menautkan QR Code ke database pesanan
+    
+    WOCtrl-->>WOUI: 16. Respon sukses pendaftaran pesanan & payload data QR Code
+    WOUI-->>Staf: 17. Sistem menyediakan QR Code untuk dilihat / diunduh / dicetak
+```
+
+---
+
+### 6.7 Sequence Diagram: Membuat Nota Pembayaran
 
 ```mermaid
 sequenceDiagram

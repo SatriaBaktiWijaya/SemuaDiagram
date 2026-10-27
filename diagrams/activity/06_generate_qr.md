@@ -1,12 +1,12 @@
-# Activity Diagram: Mengenerate QR (Inklusi Otomatis) (SRS 3.3.6)
+# Activity Diagram: Mengenerate QR (Inklusi Otomatis Work Order) (SRS 3.3.6)
 
 ```mermaid
 flowchart TD
-    Start([● Mulai]) --> S1[Sistem Menerima Trigger dari Pembaruan / Pembuatan Data Progres]
+    Start([● Mulai]) --> S1[Sistem Mendeteksi Work Order Berhasil Dibuat]
     S1 --> S2[Sistem Mengambil Nomor ID Work Order yang Sedang Diproses]
-    S2 --> S3[Sistem Mengenerate Gambar QR Code Unik Terhubung ke ID WO]
+    S2 --> S3[Sistem Mengenerate Gambar QR Code Untuk Terhubung ke ID WO]
     S3 --> S4[Sistem Menyimpan & Menautkan QR Code ke Database Pesanan]
-    S4 --> S5[Sistem Menyediakan QR Code untuk Dilihat / Diunduh]
+    S4 --> S5[Sistem Menyediakan QR Code Untuk Dilihat / Diunduh]
     S5 --> EndNode([◉ Selesai])
 
     classDef startEnd fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#1B5E20;

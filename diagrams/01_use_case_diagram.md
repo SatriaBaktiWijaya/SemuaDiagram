@@ -64,7 +64,6 @@ Customer --> UC4
 Customer --> UC8
 
 UC2 ..> UC6 : <<include>>
-UC3 ..> UC6 : <<include>>
 UC5 ..> UC2 : <<extend>>
 @enduml
 ```
@@ -113,7 +112,6 @@ usecase-beta
     Customer --> UC8
 
     UC2 ..> : include UC6
-    UC3 ..> : include UC6
     UC2 ..> : extend UC5
 ```
 
@@ -168,7 +166,6 @@ flowchart LR
     %% Relasi Antar Use Case (Include & Extend)
     UC2 -.->|&lt;&lt;extend&gt;&gt;| UC5
     UC2 -.->|&lt;&lt;include&gt;&gt;| UC6
-    UC3 -.->|&lt;&lt;include&gt;&gt;| UC6
 
     %% Styling
     classDef actorStyle fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#0D47A1,font-size:13px;
@@ -198,10 +195,10 @@ Jika Anda sudah terlanjur mengimpor diagram berwujud kotak di Draw.io dan ingin 
 | No | Nama Use Case | Admin | Marketing | Produksi | Pelanggan | Keterangan Hubungan |
 |:--:|:---|:---:|:---:|:---:|:---:|:---|
 | **UC-01** | Melakukan Login | **X** | **X** | **X** | - | Otentikasi hak akses sesuai peran (*role-based*) |
-| **UC-02** | Melakukan CRUD Work Order | **X** | **X** | - | - | Buat, ubah, hapus, dan lihat data pesanan kerja |
-| **UC-03** | Mengelola Progress | - | - | **X** | - | Update tahapan kerja & upload bukti foto |
+| **UC-02** | Melakukan CRUD Work Order | **X** | **X** | - | - | Buat, ubah, hapus, dan lihat data pesanan kerja (termasuk auto trigger QR di awal) |
+| **UC-03** | Mengelola Progress | - | - | **X** | - | Update tahapan kerja & upload bukti foto dokumentasi |
 | **UC-04** | Melihat Progress | - | - | - | **X** | Tracking langsung via QR Code / URL unik tanpa login |
 | **UC-05** | Mencari Work Order | **X** | **X** | - | - | `<<extend>>` dari CRUD Work Order (pencarian kata kunci) |
-| **UC-06** | Mengenerate QR (Inklusi) | - | - | - | - | `<<include>>` otomatis dipicu sistem saat WO / progres dibuat |
+| **UC-06** | Mengenerate QR (Inklusi) | - | - | - | - | `<<include>>` otomatis dipicu sistem 1 kali saat Work Order baru dibuat |
 | **UC-07** | Membuat Nota | **X** | - | - | - | Khusus Admin setelah pekerjaan selesai / masuk tahap bayar |
 | **UC-08** | Konsultasi WhatsApp | - | - | - | **X** | Tombol penghubung ke WA resmi perusahaan (FR-007) |

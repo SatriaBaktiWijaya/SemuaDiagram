@@ -13,8 +13,7 @@ flowchart TD
     S3 --> P2
     
     S2 -->|Ya| S4[Sistem Menyimpan Data Progres Baru]
-    S4 --> S5[Sistem Mengenerate / Memperbarui QR Code Tracking]
-    S5 --> S6[Sistem Tampilkan Notifikasi Berhasil Simpan]
+    S4 --> S6[Sistem Tampilkan Notifikasi Berhasil Simpan]
     S6 --> P5{Pekerjaan Telah Selesai Semua?}
 
     P5 -->|Belum Selesai| EndNode([◉ Selesai])
@@ -35,6 +34,6 @@ flowchart TD
     classDef decision fill:#FFF9C4,stroke:#FBC02D,stroke-width:2px,color:#F57F17;
     
     class Start,EndNode startEnd;
-    class P1,S1,P2,P3,P4,S3,S4,S5,S6,P6,S7,S8,S9,S10 action;
+    class P1,S1,P2,P3,P4,S3,S4,S6,P6,S7,S8,S9,S10 action;
     class S2,P5,P7 decision;
 ```

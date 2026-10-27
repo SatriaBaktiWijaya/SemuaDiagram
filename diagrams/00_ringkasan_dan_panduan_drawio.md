@@ -17,7 +17,7 @@ Seluruh diagram telah dipisahkan menjadi file `.md` tersendiri agar Anda dapat l
 | 3 | **Context Diagram (DFD L0)** | [03_context_diagram.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/03_context_diagram.md) | Diagram Konteks sistem sentral (0.0) dengan aliran data masuk & keluar dari 5 terminator (Admin, Marketing, Produksi, Pelanggan, WhatsApp API). |
 | 4 | **Entity Relationship Diagram (ERD)** | [04_erd_diagram.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/04_erd_diagram.md) | Skema relasional basis data MySQL lengkap dengan PK, FK, tipe data riil, dan kardinalitas relasi (1:N, 1:1). |
 | 5 | **Activity Diagram (Kompilasi)** | [05_activity_diagram.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/05_activity_diagram.md) | Kompilasi seluruh 7 Activity Diagram sesuai Bab 3.3 dokumen SRS. |
-| 6 | **Sequence Diagram (Kompilasi)** | [06_sequence_diagram.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/06_sequence_diagram.md) | Kompilasi seluruh 6 Sequence Diagram sesuai alur interaksi Bab 3.2 dokumen SRS. |
+| 6 | **Sequence Diagram (Kompilasi)** | [06_sequence_diagram.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/06_sequence_diagram.md) | Kompilasi seluruh 7 Sequence Diagram sesuai alur interaksi Bab 3.2 dokumen SRS. |
 
 ---
 
@@ -36,11 +36,12 @@ Bagi Anda yang ingin mengimpor diagram aktivitas satu per satu ke Draw.io:
 ### C. Berkas Satuan Sequence Diagram (Direktori `diagrams/sequence/`)
 Bagi Anda yang ingin mengimpor diagram sekuens satu per satu ke Draw.io:
 1. **Login**: [01_login.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/01_login.md)
-2. **CRUD Work Order**: [02_crud_work_order.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/02_crud_work_order.md)
-3. **Mengelola Progress & Auto QR**: [03_mengelola_progres.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/03_mengelola_progres.md)
+2. **CRUD Work Order & Auto Generate QR di Awal**: [02_crud_work_order.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/02_crud_work_order.md)
+3. **Mengelola Progress**: [03_mengelola_progres.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/03_mengelola_progres.md)
 4. **Melihat Progress (Tracking Mandiri)**: [04_melihat_progres.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/04_melihat_progres.md)
 5. **Mencari Work Order**: [05_mencari_work_order.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/05_mencari_work_order.md)
-6. **Membuat Nota Pembayaran**: [06_membuat_nota.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/06_membuat_nota.md)
+6. **Mengenerate QR Code (Inklusi Otomatis Work Order)**: [06_generate_qr.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/06_generate_qr.md)
+7. **Membuat Nota Pembayaran**: [07_membuat_nota.md](file:///e:/Coding/PermodelanPerangkatLunak/diagrams/sequence/07_membuat_nota.md)
 
 ---
 

@@ -118,8 +118,7 @@ flowchart TD
     S3 --> P2
     
     S2 -->|Ya| S4[Sistem Menyimpan Data Progres Baru]
-    S4 --> S5[Sistem Mengenerate / Memperbarui QR Code Tracking]
-    S5 --> S6[Sistem Tampilkan Notifikasi Berhasil Simpan]
+    S4 --> S6[Sistem Tampilkan Notifikasi Berhasil Simpan]
     S6 --> P5{Pekerjaan Telah Selesai Semua?}
 
     P5 -->|Belum Selesai| EndNode([◉ Selesai])
@@ -140,7 +139,7 @@ flowchart TD
     classDef decision fill:#FFF9C4,stroke:#FBC02D,stroke-width:2px,color:#F57F17;
     
     class Start,EndNode startEnd;
-    class P1,S1,P2,P3,P4,S3,S4,S5,S6,P6,S7,S8,S9,S10 action;
+    class P1,S1,P2,P3,P4,S3,S4,S6,P6,S7,S8,S9,S10 action;
     class S2,P5,P7 decision;
 ```
 
@@ -201,17 +200,17 @@ flowchart TD
 
 ---
 
-## 6. AD-06: Mengenerate QR (Inklusi Otomatis) (SRS 3.3.6)
+## 6. AD-06: Mengenerate QR (Inklusi Otomatis Work Order) (SRS 3.3.6)
 
-Diagram alur proses otomatis sistem (*sub-process / include*) dalam menciptakan kode batang 2D (QR Code) unik yang ditautkan ke ID Work Order.
+Diagram alur proses otomatis sistem (*sub-process / include*) dalam menciptakan kode batang 2D (QR Code) unik yang dieksekusi 1 kali di awal saat Work Order berhasil dibuat.
 
 ```mermaid
 flowchart TD
-    Start([● Mulai]) --> S1[Sistem Menerima Trigger dari Pembaruan / Pembuatan Data Progres]
+    Start([● Mulai]) --> S1[Sistem Mendeteksi Work Order Berhasil Dibuat]
     S1 --> S2[Sistem Mengambil Nomor ID Work Order yang Sedang Diproses]
-    S2 --> S3[Sistem Mengenerate Gambar QR Code Unik Terhubung ke ID WO]
+    S2 --> S3[Sistem Mengenerate Gambar QR Code Untuk Terhubung ke ID WO]
     S3 --> S4[Sistem Menyimpan & Menautkan QR Code ke Database Pesanan]
-    S4 --> S5[Sistem Menyediakan QR Code untuk Dilihat / Diunduh]
+    S4 --> S5[Sistem Menyediakan QR Code Untuk Dilihat / Diunduh]
     S5 --> EndNode([◉ Selesai])
 
     classDef startEnd fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#1B5E20;
